@@ -5,6 +5,7 @@ import { Movie } from '../../types/Movie';
 type Props = {
   onAdd: (movie: Movie) => void;
 };
+
 const DEFAULT_VALUES: Movie = {
   title: '',
   description: '',
@@ -14,12 +15,10 @@ const DEFAULT_VALUES: Movie = {
 };
 
 export const NewMovie: React.FC<Props> = ({ onAdd }) => {
-  // Increase the count after successful form submission
-  // to reset touched status of all the `Field`s
   const [count, setCount] = useState(0);
   const [movie, setMovie] = useState(DEFAULT_VALUES);
 
-  const disabled = Boolean(
+  const isFormValid = Boolean(
     movie.title.trim() &&
       movie.imgUrl.trim() &&
       movie.imdbUrl.trim() &&
@@ -29,14 +28,18 @@ export const NewMovie: React.FC<Props> = ({ onAdd }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
-    setMovie(prevMovie => ({ ...prevMovie, [name]: value }));
+    setMovie(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (!isFormValid) {
+      return;
+    }
+
     onAdd(movie);
     setMovie(DEFAULT_VALUES);
-    setCount(count + 1);
+    setCount(count + 1); // reset touched fields
   };
 
   return (
@@ -88,7 +91,7 @@ export const NewMovie: React.FC<Props> = ({ onAdd }) => {
             type="submit"
             data-cy="submit-button"
             className="button is-link"
-            disabled={!disabled}
+            disabled={!isFormValid}
           >
             Add
           </button>
